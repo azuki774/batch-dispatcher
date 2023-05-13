@@ -5,10 +5,12 @@ import (
 	"batchdispatcher/internal/job"
 	"batchdispatcher/internal/logger"
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 	"go.uber.org/zap"
 )
@@ -46,7 +48,7 @@ func NewServer() (srv *Server, err error) {
 func (s *Server) Start(ctx context.Context, port string) (err error) {
 	s.l.Info("server start")
 	r := chi.NewRouter()
-
+	r.Use(middleware.Logger)
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{"https://*", "http://*"},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
@@ -58,7 +60,17 @@ func (s *Server) Start(ctx context.Context, port string) (err error) {
 	}))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("welcome"))
+		w.Write([]byte("ok"))
+	})
+
+	r.Get("/jobs", func(w http.ResponseWriter, r *http.Request) {
+		outputJson, err := json.Marshal(&s.dispatcher.Jobs)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, string(outputJson))
 	})
 
 	http.ListenAndServe(fmt.Sprintf(":%s", port), r)
