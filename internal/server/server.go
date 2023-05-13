@@ -73,6 +73,12 @@ func (s *Server) Start(ctx context.Context, port string) (err error) {
 		fmt.Fprint(w, string(outputJson))
 	})
 
+	r.Post("/jobs/{jobname}/run", func(w http.ResponseWriter, r *http.Request) {
+		jobName := chi.URLParam(r, "jobname")
+		fmt.Println(jobName)
+		w.WriteHeader(http.StatusOK)
+	})
+
 	http.ListenAndServe(fmt.Sprintf(":%s", port), r)
 
 	return nil

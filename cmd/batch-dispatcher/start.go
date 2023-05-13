@@ -6,20 +6,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
-
-type StartOption struct {
-	Logger *zap.Logger
-}
-
-var (
-	version  string
-	revision string
-	build    string
-)
-
-var startOpt StartOption
 
 // startCmd represents the start command
 var startCmd = &cobra.Command{
