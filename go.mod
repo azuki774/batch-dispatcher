@@ -1,4 +1,4 @@
-module XXX
+module batchdispatcher
 
 go 1.19
 
