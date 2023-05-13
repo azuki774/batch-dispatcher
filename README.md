@@ -1,1 +1,1 @@
-# go-template
+# batch-dispatcher
