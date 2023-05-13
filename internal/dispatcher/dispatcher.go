@@ -4,10 +4,13 @@ import (
 	"batchdispatcher/internal/job"
 	"context"
 	"fmt"
+
+	"go.uber.org/zap"
 )
 
 type Dispatcher struct {
-	Jobs []job.Job
+	Logger *zap.Logger
+	Jobs   []job.Job
 }
 
 func (d *Dispatcher) Run(ctx context.Context, jobname string) (err error) {
