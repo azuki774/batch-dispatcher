@@ -1,7 +1,12 @@
 package main
 
 import (
+	"batchdispatcher/internal/dispatcher"
+	"batchdispatcher/internal/job"
+	"batchdispatcher/internal/logger"
+	"batchdispatcher/internal/model"
 	"batchdispatcher/internal/server"
+	"batchdispatcher/internal/timeutil"
 	"context"
 	"fmt"
 
@@ -25,9 +30,57 @@ to quickly create a Cobra application.`,
 	},
 }
 
+func NewJob(name, batchCmd string) job.Job {
+	return job.Job{
+		Name:             name,
+		BatchCmd:         batchCmd,
+		Status:           model.StatusNotRunning,
+		LastChangeStatus: timeutil.NowFunc(),
+	}
+}
+
+func NewDispatcher(jobs []job.Job) (*dispatcher.Dispatcher, error) {
+	l, err := logger.NewLogger()
+	if err != nil {
+		return &dispatcher.Dispatcher{}, err
+	}
+
+	d := &dispatcher.Dispatcher{
+		Logger: l,
+		Jobs:   jobs,
+	}
+
+	return d, nil
+}
+
+func NewServer(d *dispatcher.Dispatcher) (srv *server.Server, err error) {
+	srv = &server.Server{}
+
+	// set logger
+	l, err := logger.NewLogger()
+	if err != nil {
+		return &server.Server{}, err
+	}
+	srv.Logger = l
+
+	// set dispatcher
+	l.Info("set dispatcher")
+	srv.Dispatcher = d
+
+	return srv, nil
+}
+
 func start() (err error) {
 	ctx := context.Background()
-	srv, err := server.NewServer()
+	samplejobs1 := NewJob("ls", "ls -la")
+	samplejobs2 := NewJob("sleep", "sleep 15s")
+	d, err := NewDispatcher([]job.Job{samplejobs1, samplejobs2})
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	srv, err := NewServer(d)
 	if err != nil {
 		fmt.Println(err)
 		return err

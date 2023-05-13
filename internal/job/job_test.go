@@ -1,6 +1,7 @@
 package job
 
 import (
+	"batchdispatcher/internal/model"
 	"batchdispatcher/internal/timeutil"
 	"context"
 	"testing"
@@ -11,7 +12,7 @@ func TestJob_Run(t *testing.T) {
 	type fields struct {
 		Name             string
 		BatchCmd         string
-		Status           JobStatus
+		Status           model.JobStatus
 		LastChangeStatus time.Time
 	}
 	type args struct {
@@ -28,7 +29,7 @@ func TestJob_Run(t *testing.T) {
 			fields: fields{
 				Name:             "ls",
 				BatchCmd:         "ls",
-				Status:           StatusComplete,
+				Status:           model.StatusComplete,
 				LastChangeStatus: time.Now(),
 			},
 			wantErr: false,
@@ -38,7 +39,7 @@ func TestJob_Run(t *testing.T) {
 			fields: fields{
 				Name:             "xxx",
 				BatchCmd:         "xxx",
-				Status:           StatusComplete,
+				Status:           model.StatusComplete,
 				LastChangeStatus: time.Now(),
 			},
 			wantErr: true,

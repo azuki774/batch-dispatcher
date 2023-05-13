@@ -8,6 +8,16 @@ import (
 	"go.uber.org/zap"
 )
 
+var l *zap.Logger
+
+func init() {
+	config := zap.NewProductionConfig()
+	// config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
+	l, _ = config.Build()
+
+	l.WithOptions(zap.AddStacktrace(zap.ErrorLevel))
+}
+
 func TestDispatcher_Run(t *testing.T) {
 	type fields struct {
 		Logger *zap.Logger
@@ -26,9 +36,11 @@ func TestDispatcher_Run(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
+				Logger: l,
 				Jobs: []job.Job{
-					job.NewJob("ls", "ls -la"),
-					job.NewJob("sleep", "sleep 1s"),
+					{
+						Name: "ls",
+					},
 				},
 			},
 			args: args{
@@ -40,10 +52,7 @@ func TestDispatcher_Run(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				Jobs: []job.Job{
-					job.NewJob("ls", "ls -la"),
-					job.NewJob("sleep", "sleep 1s"),
-				},
+				Logger: l,
 			},
 			args: args{
 				ctx:     context.Background(),
