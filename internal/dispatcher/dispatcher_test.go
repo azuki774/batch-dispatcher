@@ -21,7 +21,7 @@ func init() {
 func TestDispatcher_Run(t *testing.T) {
 	type fields struct {
 		Logger *zap.Logger
-		Jobs   []job.Job
+		Jobs   []*job.Job
 	}
 	type args struct {
 		ctx     context.Context
@@ -37,9 +37,10 @@ func TestDispatcher_Run(t *testing.T) {
 			name: "ok",
 			fields: fields{
 				Logger: l,
-				Jobs: []job.Job{
+				Jobs: []*job.Job{
 					{
-						Name: "ls",
+						Logger: l,
+						Name:   "ls",
 					},
 				},
 			},
@@ -53,6 +54,11 @@ func TestDispatcher_Run(t *testing.T) {
 			name: "not found",
 			fields: fields{
 				Logger: l,
+				Jobs: []*job.Job{
+					{
+						Name: "xxx",
+					},
+				},
 			},
 			args: args{
 				ctx:     context.Background(),

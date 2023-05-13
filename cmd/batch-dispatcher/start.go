@@ -31,7 +31,9 @@ to quickly create a Cobra application.`,
 }
 
 func NewJob(name, batchCmd string) job.Job {
+	l, _ := logger.NewLogger()
 	return job.Job{
+		Logger:           l,
 		Name:             name,
 		BatchCmd:         batchCmd,
 		Status:           model.StatusNotRunning,
@@ -39,7 +41,7 @@ func NewJob(name, batchCmd string) job.Job {
 	}
 }
 
-func NewDispatcher(jobs []job.Job) (*dispatcher.Dispatcher, error) {
+func NewDispatcher(jobs []*job.Job) (*dispatcher.Dispatcher, error) {
 	l, err := logger.NewLogger()
 	if err != nil {
 		return &dispatcher.Dispatcher{}, err
@@ -74,7 +76,7 @@ func start() (err error) {
 	ctx := context.Background()
 	samplejobs1 := NewJob("ls", "ls -la")
 	samplejobs2 := NewJob("sleep", "sleep 15s")
-	d, err := NewDispatcher([]job.Job{samplejobs1, samplejobs2})
+	d, err := NewDispatcher([]*job.Job{&samplejobs1, &samplejobs2})
 	if err != nil {
 		fmt.Println(err)
 		return err

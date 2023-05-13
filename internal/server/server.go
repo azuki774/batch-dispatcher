@@ -4,6 +4,7 @@ import (
 	"batchdispatcher/internal/model"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -54,6 +55,18 @@ func (s *Server) Start(ctx context.Context, port string) (err error) {
 	r.Post("/jobs/{jobname}/run", func(w http.ResponseWriter, r *http.Request) {
 		jobName := chi.URLParam(r, "jobname")
 		fmt.Println(jobName)
+		err = s.Dispatcher.Run(context.Background(), jobName)
+		if errors.Is(err, model.ErrAlreadyRunning) {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		} else if errors.Is(err, model.ErrNotFound) {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		} else if err != nil {
+			// unknown error
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		w.WriteHeader(http.StatusOK)
 	})
 

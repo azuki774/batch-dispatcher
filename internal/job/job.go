@@ -7,9 +7,12 @@ import (
 	"fmt"
 	"os/exec"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 type Job struct {
+	Logger           *zap.Logger
 	Name             string
 	BatchCmd         string
 	Status           model.JobStatus
@@ -24,12 +27,14 @@ func (j *Job) Run(ctx context.Context) error {
 
 	if err != nil {
 		j.ChangeStatus(model.StatusError)
+		j.Logger.Error("exec error", zap.Error(err))
 		return err
 	}
 
 	exitCode := cmd.ProcessState.ExitCode()
 	if exitCode != 0 {
 		j.ChangeStatus(model.StatusError)
+		j.Logger.Error("unexpected exit code", zap.Error(err))
 		return fmt.Errorf("unexpected exit code")
 
 	}
@@ -45,6 +50,7 @@ func (j *Job) ChangeStatus(nextStatus model.JobStatus) {
 		j.LastSucessStatus = t
 	}
 	j.LastChangeStatus = t
+	j.Logger.Info("change status", zap.String("name", j.Name), zap.String("status", string(j.Status)))
 }
 
 func (j *Job) GetName() (jobName string) {
