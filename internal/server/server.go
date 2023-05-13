@@ -1,9 +1,7 @@
 package server
 
 import (
-	"batchdispatcher/internal/dispatcher"
-	"batchdispatcher/internal/job"
-	"batchdispatcher/internal/logger"
+	"batchdispatcher/internal/model"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -16,37 +14,17 @@ import (
 )
 
 type Server struct {
-	l          *zap.Logger
-	dispatcher *dispatcher.Dispatcher
+	Logger     *zap.Logger
+	Dispatcher dispatcher
 }
 
-var sampleJobs = []job.Job{
-	job.NewJob("ls", "ls -la"),
-	job.NewJob("sleep", "sleep 15s"),
-}
-
-func NewServer() (srv *Server, err error) {
-	srv = &Server{}
-
-	// set logger
-	l, err := logger.NewLogger()
-	if err != nil {
-		return &Server{}, err
-	}
-	srv.l = l
-
-	// set dispatcher
-	l.Info("set dispatcher")
-	srv.dispatcher = &dispatcher.Dispatcher{
-		Logger: l,
-		Jobs:   sampleJobs, // TODO
-	}
-
-	return srv, nil
+type dispatcher interface {
+	Run(ctx context.Context, jobname string) (err error)
+	GetJobsInfo() (jobInfo []model.JobInfo)
 }
 
 func (s *Server) Start(ctx context.Context, port string) (err error) {
-	s.l.Info("server start")
+	s.Logger.Info("server start")
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(cors.Handler(cors.Options{
@@ -64,7 +42,7 @@ func (s *Server) Start(ctx context.Context, port string) (err error) {
 	})
 
 	r.Get("/jobs", func(w http.ResponseWriter, r *http.Request) {
-		outputJson, err := json.Marshal(&s.dispatcher.Jobs)
+		outputJson, err := json.Marshal(s.Dispatcher.GetJobsInfo())
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
