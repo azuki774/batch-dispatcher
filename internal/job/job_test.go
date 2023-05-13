@@ -11,7 +11,7 @@ func TestJob_Run(t *testing.T) {
 	type fields struct {
 		Name             string
 		BatchCmd         string
-		status           JobStatus
+		Status           JobStatus
 		LastChangeStatus time.Time
 	}
 	type args struct {
@@ -28,7 +28,7 @@ func TestJob_Run(t *testing.T) {
 			fields: fields{
 				Name:             "ls",
 				BatchCmd:         "ls",
-				status:           StatusComplete,
+				Status:           StatusComplete,
 				LastChangeStatus: time.Now(),
 			},
 			wantErr: false,
@@ -38,7 +38,7 @@ func TestJob_Run(t *testing.T) {
 			fields: fields{
 				Name:             "xxx",
 				BatchCmd:         "xxx",
-				status:           StatusComplete,
+				Status:           StatusComplete,
 				LastChangeStatus: time.Now(),
 			},
 			wantErr: true,
@@ -54,7 +54,7 @@ func TestJob_Run(t *testing.T) {
 			j := &Job{
 				Name:             tt.fields.Name,
 				BatchCmd:         tt.fields.BatchCmd,
-				status:           tt.fields.status,
+				Status:           tt.fields.Status,
 				LastChangeStatus: tt.fields.LastChangeStatus,
 			}
 			if err := j.Run(tt.args.ctx); (err != nil) != tt.wantErr {

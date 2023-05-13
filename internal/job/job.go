@@ -20,15 +20,16 @@ var (
 type Job struct {
 	Name             string
 	BatchCmd         string
-	status           JobStatus
+	Status           JobStatus
 	LastChangeStatus time.Time
+	LastSucessStatus time.Time
 }
 
 func NewJob(name, batchCmd string) Job {
 	return Job{
 		Name:             name,
 		BatchCmd:         batchCmd,
-		status:           StatusNotRunning,
+		Status:           StatusNotRunning,
 		LastChangeStatus: timeutil.NowFunc(),
 	}
 }
@@ -55,10 +56,14 @@ func (j *Job) Run(ctx context.Context) error {
 }
 
 func (j *Job) ChangeStatus(nextStatus JobStatus) {
-	j.status = nextStatus
-	j.LastChangeStatus = timeutil.NowFunc()
+	j.Status = nextStatus
+	t := timeutil.NowFunc()
+	if j.Status == StatusComplete {
+		j.LastSucessStatus = t
+	}
+	j.LastChangeStatus = t
 }
 
 func (j *Job) GetStatus() (status JobStatus) {
-	return j.status
+	return j.Status
 }
