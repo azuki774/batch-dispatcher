@@ -48,6 +48,17 @@ func TestJob_Run(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "sleep 15s",
+			fields: fields{
+				Logger:           l,
+				Name:             "sleep",
+				BatchCmd:         "sleep 1s",
+				Status:           model.StatusComplete,
+				LastChangeStatus: time.Now(),
+			},
+			wantErr: false,
+		},
+		{
 			name: "xxx (not found)",
 			fields: fields{
 				Logger:           l,
