@@ -53,7 +53,7 @@ func (d *Dispatcher) GetJobsInfo() (jobInfo []model.JobInfo) {
 			BatchCmd:         job.GetBatchCmd(),
 			Status:           job.GetStatus(),
 			LastChangeStatus: job.GetLastChangeStatus(),
-			LastSucessStatus: job.GetLastSucessStatus(),
+			LastSuccessStatus: job.GetLastSuccessStatus(),
 		})
 	}
 

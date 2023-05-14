@@ -13,12 +13,12 @@ import (
 )
 
 type Job struct {
-	Logger           *zap.Logger
-	Name             string
-	BatchCmd         string
-	Status           model.JobStatus
-	LastChangeStatus time.Time
-	LastSucessStatus time.Time
+	Logger            *zap.Logger
+	Name              string
+	BatchCmd          string
+	Status            model.JobStatus
+	LastChangeStatus  time.Time
+	LastSuccessStatus time.Time
 }
 
 func (j *Job) Run(ctx context.Context) error {
@@ -48,7 +48,7 @@ func (j *Job) ChangeStatus(nextStatus model.JobStatus) {
 	j.Status = nextStatus
 	t := timeutil.NowFunc()
 	if j.Status == model.StatusComplete {
-		j.LastSucessStatus = t
+		j.LastSuccessStatus = t
 	}
 	j.LastChangeStatus = t
 	j.Logger.Info("change status", zap.String("name", j.Name), zap.String("status", string(j.Status)))
@@ -70,8 +70,8 @@ func (j *Job) GetLastChangeStatus() time.Time {
 	return j.LastChangeStatus
 }
 
-func (j *Job) GetLastSucessStatus() time.Time {
-	return j.LastSucessStatus
+func (j *Job) GetLastSuccessStatus() time.Time {
+	return j.LastSuccessStatus
 }
 
 func separateNameArgs(cmdStr string) (cmdName string, cmdArgs []string) {
