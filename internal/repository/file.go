@@ -2,13 +2,13 @@ package repository
 
 import (
 	"batchdispatcher/internal/model"
-	"io/ioutil"
+	"os"
 
 	"gopkg.in/yaml.v2"
 )
 
 func LoadConfigFile(path string) (cs []model.JobConfig, err error) {
-	buf, err := ioutil.ReadFile(path)
+	buf, err := os.ReadFile(path)
 	if err != nil {
 		return
 	}
