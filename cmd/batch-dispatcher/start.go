@@ -5,13 +5,17 @@ import (
 	"batchdispatcher/internal/job"
 	"batchdispatcher/internal/logger"
 	"batchdispatcher/internal/model"
+	"batchdispatcher/internal/repository"
 	"batchdispatcher/internal/server"
 	"batchdispatcher/internal/timeutil"
 	"context"
-	"fmt"
 
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
 )
+
+var l *zap.Logger
+var configFilePath string // コンフィグファイルのパス
 
 // startCmd represents the start command
 var startCmd = &cobra.Command{
@@ -23,15 +27,14 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	SilenceErrors: true,
-	SilenceUsage:  true,
+	SilenceErrors: false,
+	SilenceUsage:  false,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return start()
 	},
 }
 
 func NewJob(name, batchCmd string) job.Job {
-	l, _ := logger.NewLogger()
 	return job.Job{
 		Logger:           l,
 		Name:             name,
@@ -42,11 +45,6 @@ func NewJob(name, batchCmd string) job.Job {
 }
 
 func NewDispatcher(jobs []*job.Job) (*dispatcher.Dispatcher, error) {
-	l, err := logger.NewLogger()
-	if err != nil {
-		return &dispatcher.Dispatcher{}, err
-	}
-
 	d := &dispatcher.Dispatcher{
 		Logger: l,
 		Jobs:   jobs,
@@ -59,32 +57,45 @@ func NewServer(d *dispatcher.Dispatcher) (srv *server.Server, err error) {
 	srv = &server.Server{}
 
 	// set logger
-	l, err := logger.NewLogger()
-	if err != nil {
-		return &server.Server{}, err
-	}
 	srv.Logger = l
 
 	// set dispatcher
-	l.Info("set dispatcher")
 	srv.Dispatcher = d
 
 	return srv, nil
 }
 
 func start() (err error) {
-	ctx := context.Background()
-	samplejobs1 := NewJob("ls", "ls -la")
-	samplejobs2 := NewJob("sleep", "sleep 15s")
-	d, err := NewDispatcher([]*job.Job{&samplejobs1, &samplejobs2})
+	l, err = logger.NewLogger()
 	if err != nil {
-		fmt.Println(err)
+		println(err)
+		return err
+	}
+	l.Info("set logger")
+
+	ctx := context.Background()
+	configs, err := repository.LoadConfigFile(configFilePath)
+	if err != nil {
+		l.Error("failed to load config file", zap.Error(err))
+		return err
+	}
+
+	l.Info("loaded config file")
+	var targetJob []*job.Job
+	for _, c := range configs {
+		job := NewJob(c.Name, c.BatchCmd)
+		targetJob = append(targetJob, &job)
+	}
+
+	d, err := NewDispatcher(targetJob)
+	if err != nil {
+		l.Error("failed to load dispatcher", zap.Error(err))
 		return err
 	}
 
 	srv, err := NewServer(d)
 	if err != nil {
-		fmt.Println(err)
+		l.Error("failed to run server", zap.Error(err))
 		return err
 	}
 
@@ -94,4 +105,5 @@ func start() (err error) {
 func init() {
 	rootCmd.AddCommand(startCmd)
 	startCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	startCmd.Flags().StringVarP(&configFilePath, "config-file", "c", "./config.yaml", "config file path")
 }
