@@ -73,6 +73,7 @@ func start() (err error) {
 	}
 	defer l.Sync()
 	l.Info("set logger")
+	l.Info("binary info", zap.String("version", version), zap.String("revision", revision), zap.String("build", build))
 
 	ctx := context.Background()
 	configs, err := repository.LoadConfigFile(configFilePath)
