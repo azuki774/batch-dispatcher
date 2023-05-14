@@ -35,9 +35,7 @@ func (d *Dispatcher) Run(ctx context.Context, jobname string) (err error) {
 			}
 
 			// job Run
-			fmt.Println(d.Jobs)
-			j.Run(ctx)
-			fmt.Println(d.Jobs)
+			go j.Run(ctx)
 			return nil
 		}
 	}
