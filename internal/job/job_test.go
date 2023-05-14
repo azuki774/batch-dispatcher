@@ -6,10 +6,22 @@ import (
 	"context"
 	"testing"
 	"time"
+
+	"go.uber.org/zap"
 )
 
+var l *zap.Logger
+
+func init() {
+	config := zap.NewProductionConfig()
+	// config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
+	l, _ = config.Build()
+
+	l.WithOptions(zap.AddStacktrace(zap.ErrorLevel))
+}
 func TestJob_Run(t *testing.T) {
 	type fields struct {
+		Logger           *zap.Logger
 		Name             string
 		BatchCmd         string
 		Status           model.JobStatus
@@ -27,6 +39,7 @@ func TestJob_Run(t *testing.T) {
 		{
 			name: "ls",
 			fields: fields{
+				Logger:           l,
 				Name:             "ls",
 				BatchCmd:         "ls",
 				Status:           model.StatusComplete,
@@ -35,8 +48,20 @@ func TestJob_Run(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "sleep 15s",
+			fields: fields{
+				Logger:           l,
+				Name:             "sleep",
+				BatchCmd:         "sleep 1s",
+				Status:           model.StatusComplete,
+				LastChangeStatus: time.Now(),
+			},
+			wantErr: false,
+		},
+		{
 			name: "xxx (not found)",
 			fields: fields{
+				Logger:           l,
 				Name:             "xxx",
 				BatchCmd:         "xxx",
 				Status:           model.StatusComplete,
@@ -53,6 +78,7 @@ func TestJob_Run(t *testing.T) {
 			}
 
 			j := &Job{
+				Logger:           tt.fields.Logger,
 				Name:             tt.fields.Name,
 				BatchCmd:         tt.fields.BatchCmd,
 				Status:           tt.fields.Status,

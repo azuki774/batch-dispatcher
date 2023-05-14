@@ -22,7 +22,7 @@ import (
 
 type Dispatcher struct {
 	Logger *zap.Logger
-	Jobs   []job.Job
+	Jobs   []*job.Job
 }
 
 func (d *Dispatcher) Run(ctx context.Context, jobname string) (err error) {
@@ -53,13 +53,9 @@ func (d *Dispatcher) GetJobsInfo() (jobInfo []model.JobInfo) {
 			BatchCmd:         job.GetBatchCmd(),
 			Status:           job.GetStatus(),
 			LastChangeStatus: job.GetLastChangeStatus(),
-			LastSucessStatus: job.GetLastSucessStatus(),
+			LastSuccessStatus: job.GetLastSuccessStatus(),
 		})
 	}
 
 	return jobInfo
-}
-
-func (d *Dispatcher) RegistJob(job job.Job) {
-	d.Jobs = append(d.Jobs, job)
 }
