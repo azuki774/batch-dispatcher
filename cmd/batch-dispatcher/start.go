@@ -71,6 +71,7 @@ func start() (err error) {
 		println(err)
 		return err
 	}
+	defer l.Sync()
 	l.Info("set logger")
 
 	ctx := context.Background()
