@@ -24,3 +24,8 @@ type JobInfo struct {
 	LastChangeStatus  time.Time `json:"last_change_status"`
 	LastSuccessStatus time.Time `json:"last_success_status"`
 }
+
+type JobConfig struct {
+	Name     string `yaml:"name"`
+	BatchCmd string `yaml:"cmd"`
+}

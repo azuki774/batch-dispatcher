@@ -1,0 +1,4 @@
+- name: "ls"
+  cmd: "ls -la"
+- name: "sleep"
+  cmd: "sleep 12s"
