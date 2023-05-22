@@ -1,6 +1,11 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+<script>
+import BatchDispatcher from './components/BatchDispatcher.vue'
+
+export default {
+  name: 'App',
+  components: {}
+}
+
 </script>
 
 <template>
@@ -11,10 +16,7 @@ import TheWelcome from './components/TheWelcome.vue'
       <HelloWorld msg="You did it!" />
     </div>
   </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  <BatchDispatcher />
 </template>
 
 <style scoped>
