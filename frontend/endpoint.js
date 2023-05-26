@@ -1,2 +1,2 @@
 // for your environment
-var hostEndpoint = 'http://localhost:3000'
+var hostEndpoint = 'http://azk-nas.pancake-little.ts.net:3000'

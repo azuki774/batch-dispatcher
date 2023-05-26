@@ -13,36 +13,59 @@
 <body>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.js"></script>
+    <script src="./endpoint.js"></script>
     <script type="module">
         const { createApp } = Vue
         createApp({
             data() {
                 return {
                     count: 0,
-                    api: null
+                    api: null,
+                    resjson: null,
+                    items: [
+                    ],
                 }
             },
             methods: {
-                increment() {
-                    this.count++
-                }
             },
             mounted: function () {
-                console.log('mounted run')
-                axios.get('http://azk-nas.pancake-little.ts.net:3000/jobs', {
-                    headers: {
-                    }
+                let abc;
+                const self = this;
+                console.log('mounted run: ' + hostEndpoint + '/jobs')
+                axios.get(hostEndpoint + '/jobs', {
+                    headers: {}
+                }).then((res) => {
+                    self.items = res.data;
                 })
-                    .then(response => this.api = response.data)
+
             }
         }).mount('#app')
 
     </script>
 
     <div id="app">
-        <button @click="increment">count is: {{ count }}</button>
-        <input type="button" value="ボタンを押す" onclick="sample()">
-        <p>{{ api }}</p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col" />
+                    <th scope="col">name</th>
+                    <th scope="col">command</th>
+                    <th scope="col">status</th>
+                    <th scope="col">last_change_status</th>
+                    <th scope="col">last_success_status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, index) in items" :key="index">
+                    <th scope="row">{{ index+1 }}</th>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.cmd }}</td>
+                    <td>{{ item.status }}</td>
+                    <td>{{ item.last_change_status }}</td>
+                    <td>{{ item.last_success_status }}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </body>
 
