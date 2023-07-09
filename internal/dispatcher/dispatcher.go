@@ -4,7 +4,6 @@ import (
 	"batchdispatcher/internal/job"
 	"batchdispatcher/internal/model"
 	"context"
-	"fmt"
 
 	"go.uber.org/zap"
 )
@@ -47,12 +46,11 @@ func (d *Dispatcher) Run(ctx context.Context, jobname string) (err error) {
 // GetJobsInfo は Job処理用の構造体から表示用の構造体に変換
 func (d *Dispatcher) GetJobsInfo() (jobInfo []model.JobInfo) {
 	for _, job := range d.Jobs {
-		fmt.Println(job)
 		jobInfo = append(jobInfo, model.JobInfo{
-			Name:             job.GetName(),
-			BatchCmd:         job.GetBatchCmd(),
-			Status:           job.GetStatus(),
-			LastChangeStatus: job.GetLastChangeStatus(),
+			Name:              job.GetName(),
+			BatchCmd:          job.GetBatchCmd(),
+			Status:            job.GetStatus(),
+			LastChangeStatus:  job.GetLastChangeStatus(),
 			LastSuccessStatus: job.GetLastSuccessStatus(),
 		})
 	}
