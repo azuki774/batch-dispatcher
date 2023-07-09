@@ -4,6 +4,7 @@ import (
 	"batchdispatcher/internal/dispatcher"
 	"batchdispatcher/internal/job"
 	"batchdispatcher/internal/logger"
+	"batchdispatcher/internal/metrics"
 	"batchdispatcher/internal/model"
 	"batchdispatcher/internal/repository"
 	"batchdispatcher/internal/server"
@@ -101,6 +102,13 @@ func start() (err error) {
 		return err
 	}
 
+	metricsSrv := metrics.MetricsServer{
+		Logger:     l,
+		Dispatcher: d,
+		Port:       "9999",
+	}
+
+	go metricsSrv.Start(ctx)
 	return srv.Start(ctx, "3000")
 }
 
